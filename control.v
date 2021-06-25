@@ -2,7 +2,7 @@
 
 module control
 #(
-parameter S0 = 3'b000,S1 = 3'b001
+parameter S0 = 3'b000,  S1 = 3'b001,
 	  S2 = 3'b010 , S3 = 3'b011, FINISH = 3'b100 
 )
 (
@@ -10,9 +10,9 @@ parameter S0 = 3'b000,S1 = 3'b001
 	input      [2:0]    count,
 
 	output reg [2:0]    state,
-	output 		    sela,selb,done_flag,
-	output     [1:0]    sel_shifter
-)
+	output reg 	    sela,selb,done_flag,
+	output reg [1:0]    sel_shifter
+);
 
 	reg        [2:0]    n_state;	
 
@@ -24,13 +24,13 @@ parameter S0 = 3'b000,S1 = 3'b001
 			{S2,1'b1}:    n_state = S3;
 			{S3,1'b1}:    n_state = FINISH;
 			{FINISH,1'b1}:n_state = FINISH;
-			default      :n_state = IDLE;
+			default      :n_state = S0;
 		endcase
 	end
 
 	//clk
 	always@(posedge clk or negedge rst)begin
-		if(!rst)state <= IDLE;
+		if(!rst)state <= S0;
 		else state <= n_state;
 	end
 

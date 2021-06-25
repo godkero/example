@@ -6,13 +6,13 @@ module shifter(
 	output reg 	[15:0]	outp
 );
 
-	always@(shift_cntrl)begin
+	always@(*)begin
 		if(shift_cntrl == 2'b01)
-			outp = inp<<4;
+			outp = {4'h0,inp,4'h0};
 		else if(shift_cntrl == 2'b10)
-			outp = inp<<8;
+			outp = {inp,8'h00};
 		else 
-			outp = inp;
+			outp = {8'h00,inp};
 	end
 
 endmodule

@@ -2,22 +2,29 @@
 
 module tb_top;
 
-	reg 	   	clk,rst;
+	reg 	   	clk,rst,start;
 	reg 	[7:0] 	a,b;
 	
-	wire 	[15:0] 	product;
+	wire 	[15:0] 	d_out;
 	wire        	done;
 
 
-	top(.clk(clk),
+	top top0(.clk(clk),
 	    .rst(rst),
 	    .start(start),
 	    .a(a),
-	    .b(b));
+	    .b(b),
+	    .d_out(d_out),
+	    .done(done));
 
 	initial begin
 		a = 8'b10000001;
 		b = 8'b00010011;
+
+
+		#750 
+		a = 8'hf0;
+		b = 8'h35;
 	end
 
 

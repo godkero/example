@@ -6,6 +6,6 @@ module mux4(
 	output [3:0]	mux_out
 );
 
-	assign mux_out = (mux_sel==1'b1) ? mux_in_a[3:0] : mux_in_b[3:0];
+	assign mux_out = (mux_sel==1'b1) ? mux_in_a : mux_in_b;
 
 endmodule
