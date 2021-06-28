@@ -80,9 +80,7 @@ module top
 				 	 .cnt(cnt)
 					 );	
 
-	seven_seg_cntrl seg0(.inp(state),
-						 .seg_position(seg_position)
-						 );
+	seven_seg_cntrl seven_seg0(.inp(state),.seg_position(seg_position));
 	
 
 endmodule

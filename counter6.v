@@ -6,12 +6,11 @@ module counter6(
 );
 
 	always@(posedge clk or negedge rst)begin
-		if(!rst)cnt <= 3'b000;
-		else if(start == 1'b1)begin
-			if(cnt== 3'b101) cnt<=cnt;
-			else cnt<=cnt +1'b1;
-		end
-		else cnt <= 3'b000;
+		if(!rst)				cnt <= 3'b000;
+		else if(start == 1'b1 && cnt == 3'b000) cnt<=cnt +1'b1;
+		else if(cnt == 3'b101)			cnt <= 3'b000;
+		else if(cnt != 3'b000)			cnt <= cnt + 3'b001;
+		else 					cnt <= 3'b000;		
 	end
 
 endmodule

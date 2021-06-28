@@ -17,17 +17,25 @@ module tb_top;
 	    .b(b),
 	    .d_out(d_out),
 	    .done_flag(done),
-		.seg_position
+		.seg_position(seg_position)
 		);
 
 	initial begin
 		a = 8'b10000001;
 		b = 8'b00010011;
 
-
-		#750 
+		#100 
 		a = 8'hf0;
 		b = 8'h35;
+		#100 
+		a = 8'h0f;
+		b = 8'h44;
+		#100 
+		a = 8'hff;
+		b = 8'h00;
+		#100 
+		a = 8'hff;
+		b = 8'hf1;
 	end
 
 
@@ -42,11 +50,13 @@ module tb_top;
 	  #1000 $finish;
 	 end
 
-	initial
-    begin
+	/*
+ * 	initial
+    	begin
         $dumpfile("tb_top.vcd");
         $dumpvars(0,tb_top);
-    end
+    	end
+*/
 
 	always #5 clk = ~clk ; 
 
