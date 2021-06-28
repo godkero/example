@@ -21,35 +21,40 @@ module tb_top;
 		);
 
 	initial begin
+		$monitor(" time:%t %d * %d=%d,done_flag = %d",$time, a,b,d_out,done);
 		a = 8'b10000001;
 		b = 8'b00010011;
 
-		#100 
+		#100
 		a = 8'hf0;
 		b = 8'h35;
-		#100 
+		#200 
 		a = 8'h0f;
 		b = 8'h44;
-		#100 
+		#200 
 		a = 8'hff;
 		b = 8'h00;
-		#100 
+		#200 
 		a = 8'hff;
 		b = 8'hf1;
+		#200 
+		a = 8'hab;
+		b = 8'hcd;
+		#200 
+		a = 8'h11;
+		b = 8'h11;
 	end
 
-
+	
 	initial begin 
 		rst = 1 ;
 		clk = 0 ;
  	  #10	rst = 0 ;
 	  #10 	rst = 1 ;
-	  #100	start = 1;
-	  #600  start = 0;
- 	  #400  start = 1; 
-	  #1000 $finish;
+	  #100	start = 1; 
+	  #2000 $finish;
 	 end
-
+	
 	/*
  * 	initial
     	begin
