@@ -6,12 +6,15 @@ module top
 	input 		    clk,rst,start,
 	input 	[7:0] 	a,b,
 	output 	[15:0] 	d_out,
-	output 			done
+	output 			done_flag,
+	output  [7:0]   seg_position
+	
 );	
 
 	wire            clk_en;
 	wire    [2:0]   cnt;
-	wire 		sela,selb;
+	wire 			sela,selb;
+	wire        	data_sel;
 	wire    [1:0]	sel_shift;
 	wire    [7:0]   product;
 	wire 	[3:0] 	aout,bout;
@@ -41,12 +44,16 @@ module top
 				     .shift_cntrl(sel_shift),
 					 .outp(s_out)
 					 );
-	
-	assign sum = (state ==3'b000) ? 0 : d_out;
-	assign clk_en = done? 1'b0 : 1'b1;	
+	data_selector d_sel0(.d_in(d_out),
+						 .data_sel(data_sel),
+						 .p_out(sum)
+						);
 
 	//add sum
-	adder adder0(.sum(value),.dataa(s_out),.datab(sum));	
+	adder adder0(.sum(value),
+				 .dataa(s_out),
+				 .datab(sum)
+				 );	
 		
 	reg_16bit data0(.clk(clk),
 			.rst(rst),
@@ -56,20 +63,26 @@ module top
 			); 
 	
 	control con0(.clk(clk),
-		     .rst(rst),
-		     .start(start),
-		     .count(cnt),
-		     .state(state),
-	  	     .sela(sela),
-		     .selb(selb),
-		     .sel_shifter(sel_shift),
-		     .done_flag(done)
+		     	 .rst(rst),
+		     	 .start(start),
+		     	 .count(cnt),
+			 	 .data_sel(data_sel),
+			 	 .clk_en(clk_en),
+		     	 .state(state),
+	  	     	 .sela(sela),
+		     	 .selb(selb),
+		     	 .sel_shifter(sel_shift),
+		     	 .done_flag(done_flag)
 		   );
 	counter6 counter(.clk(clk),
-		  .rst(rst),
-		  .start(start),
- 		  .cnt(cnt)
-		  );	
+		  			 .rst(rst),
+		  			 .start(start),
+				 	 .cnt(cnt)
+					 );	
+
+	seven_seg_cntrl seg0(.inp(state),
+						 .seg_position(seg_position)
+						 );
 	
 
 endmodule

@@ -7,6 +7,7 @@ module tb_top;
 	
 	wire 	[15:0] 	d_out;
 	wire        	done;
+	wire    [7:0]  	seg_position;
 
 
 	top top0(.clk(clk),
@@ -15,7 +16,9 @@ module tb_top;
 	    .a(a),
 	    .b(b),
 	    .d_out(d_out),
-	    .done(done));
+	    .done_flag(done),
+		.seg_position
+		);
 
 	initial begin
 		a = 8'b10000001;
@@ -38,6 +41,12 @@ module tb_top;
  	  #400  start = 1; 
 	  #1000 $finish;
 	 end
+
+	initial
+    begin
+        $dumpfile("tb_top.vcd");
+        $dumpvars(0,tb_top);
+    end
 
 	always #5 clk = ~clk ; 
 
