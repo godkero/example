@@ -16,7 +16,7 @@ parameter S0 = 3'b000,  S1 = 3'b001,
 
 	reg        [2:0]    n_state;	
 
-
+	end
 	always@*begin
 		case({count,start})
 			{S0,1'b1}:    n_state = S1;

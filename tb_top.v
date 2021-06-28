@@ -36,6 +36,7 @@ module tb_top;
 	  #100	start = 1;
 	  #600  start = 0;
  	  #400  start = 1; 
+	  #1000 $finish;
 	 end
 
 	always #5 clk = ~clk ; 

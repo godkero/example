@@ -1,15 +1,13 @@
 `timescale 10ns/10ps
 
 
-
 module top
 (
-	input 		clk,rst,start,
+	input 		    clk,rst,start,
 	input 	[7:0] 	a,b,
 	output 	[15:0] 	d_out,
-	output 		done
-);
-	
+	output 			done
+);	
 
 	wire            clk_en;
 	wire    [2:0]   cnt;
@@ -23,12 +21,26 @@ module top
 	wire	[15:0] 	s_out;	
 	
 	//mux a,b
-	mux4 mux_a(a[7:4],a[3:0],sela, aout);
-	mux4 mux_b(b[7:4],b[3:0],selb, bout);
+	mux4 mux_a(.mux_in_a(a[7:4]),
+			   .mux_in_b(a[3:0]),
+			   .mux_sel(sela), 
+			   .mux_out(aout)
+			   );
+	mux4 mux_b(.mux_in_a(b[7:4]),
+			   .mux_in_b(b[3:0]),
+			   .mux_sel(selb), 
+			   .mux_out(bout)
+			   );
 	//product
-	mult4to4 mul0(aout,bout,product);
+	mult4to4 mul0(.dataa(aout),
+				  .datab(bout),
+				  .product(product)
+				  );
 	//shift value
-	shifter shifter0(product,sel_shift,s_out);
+	shifter shifter0(.inp(product),
+				     .shift_cntrl(sel_shift),
+					 .outp(s_out)
+					 );
 	
 	assign sum = (state ==3'b000) ? 0 : d_out;
 	assign clk_en = done? 1'b0 : 1'b1;	
@@ -58,6 +70,6 @@ module top
 		  .start(start),
  		  .cnt(cnt)
 		  );	
-
+	
 
 endmodule
