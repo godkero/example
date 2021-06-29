@@ -17,36 +17,51 @@ module tb_top;
 	    .b(b),
 	    .d_out(d_out),
 	    .done_flag(done),
-		.seg_position
+		.seg_position(seg_position)
 		);
 
 	initial begin
+		$monitor(" time:%t %d * %d=%d,done_flag = %d",$time, a,b,d_out,done);
 		a = 8'b10000001;
 		b = 8'b00010011;
 
-
-		#750 
+		#100
 		a = 8'hf0;
 		b = 8'h35;
+		#200 
+		a = 8'h0f;
+		b = 8'h44;
+		#200 
+		a = 8'hff;
+		b = 8'h00;
+		#200 
+		a = 8'hff;
+		b = 8'hf1;
+		#200 
+		a = 8'hab;
+		b = 8'hcd;
+		#200 
+		a = 8'h11;
+		b = 8'h11;
 	end
 
-
+	
 	initial begin 
 		rst = 1 ;
 		clk = 0 ;
  	  #10	rst = 0 ;
 	  #10 	rst = 1 ;
-	  #100	start = 1;
-	  #600  start = 0;
- 	  #400  start = 1; 
-	  #1000 $finish;
+	  #100	start = 1; 
+	  #2000 $finish;
 	 end
-
-	initial
-    begin
+	
+	/*
+ * 	initial
+    	begin
         $dumpfile("tb_top.vcd");
         $dumpvars(0,tb_top);
-    end
+    	end
+*/
 
 	always #5 clk = ~clk ; 
 

@@ -10,9 +10,6 @@ module reg_16bit(
 		else p <= p;
 	end
 
-	always@*begin
-		;
-	end
 	
 
 endmodule   
