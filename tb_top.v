@@ -21,7 +21,7 @@ module tb_top;
 		);
 
 	initial begin
-		$monitor(" time:%t %d * %d=%d,done_flag = %d",$time, a,b,d_out,done);
+		$monitor(" time:%t %d * %d  Calculated=%d ,done_flag = %d",$time, a,b,d_out,done);
 		a = 8'b10000001;
 		b = 8'b00010011;
 
@@ -49,6 +49,7 @@ module tb_top;
 	initial begin 
 		rst = 1 ;
 		clk = 0 ;
+		start = 0;
  	  #10	rst = 0 ;
 	  #10 	rst = 1 ;
 	  #100	start = 1; 

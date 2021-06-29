@@ -25,6 +25,7 @@ module top
 	wire	[15:0] 	s_out;	
 	
 	detect_input dectector(.clk(clk),
+				.rst(rst),
 				.a(a),
 				.b(b),
 				.a_out(a_in),

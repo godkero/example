@@ -49,13 +49,13 @@ parameter IDLE=3'b000,S0 = 3'b001,  S1 = 3'b010,
 	//output logic
 	always@(state)begin		
 		case(state)
-			IDLE:	begin sela = 1'bx;selb = 1'bx;sel_shifter = 2'bxx;done_flag = 1'b0;data_sel = 1'b1;clk_en = 1'b1;end
+			IDLE:	begin sela = 1'b1;selb = 1'b1;sel_shifter = 2'b10;done_flag = 1'b0;data_sel = 1'b1;clk_en = 1'b1;end
 			S0:	begin sela = 1'b1;selb = 1'b1;sel_shifter = 2'b10;done_flag = 1'b0;data_sel = 1'b1;clk_en = 1'b1;end
 			S1:	begin sela = 1'b1;selb = 1'b0;sel_shifter = 2'b01;done_flag = 1'b0;data_sel = 1'b0;clk_en = 1'b1;end
 			S2:   	begin sela = 1'b0;selb = 1'b1;sel_shifter = 2'b01;done_flag = 1'b0;data_sel = 1'b0;clk_en = 1'b1;end
 			S3:    	begin sela = 1'b0;selb = 1'b0;sel_shifter = 2'b00;done_flag = 1'b0;data_sel = 1'b0;clk_en = 1'b1;end
 			FINISH:	begin sela = 1'bx;selb = 1'bx;sel_shifter = 2'bxx;done_flag = 1'b1;data_sel = 1'b1;clk_en = 1'b0;end
-			ERROR:	begin sela = 1'b1;selb = 1'b1;sel_shifter = 2'b10;done_flag = 1'b1;data_sel = 1'b0;clk_en = 1'b0;end
+			ERROR:	begin sela = 1'b1;selb = 1'b1;sel_shifter = 2'b10;done_flag = 1'b0;data_sel = 1'b1;clk_en = 1'b1;end
 		endcase
 	end
 
