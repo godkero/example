@@ -10,7 +10,8 @@ module top
 	output  [7:0]   seg_position
 	
 );	
-
+	wire    [7:0]  a_in,b_in;
+	wire        	changed;
 	wire            clk_en;
 	wire    [2:0]   cnt;
 	wire 			sela,selb;
@@ -23,14 +24,22 @@ module top
 	wire  	[15:0]	value;
 	wire	[15:0] 	s_out;	
 	
+	detect_input dectector(.clk(clk),
+				.a(a),
+				.b(b),
+				.a_out(a_in),
+				.b_out(b_in),
+				.changed(changed)
+				);				
+	
 	//mux a,b
-	mux4 mux_a(.mux_in_a(a[7:4]),
+	mux4 mux_a(.mux_in_a(a_in[7:4]),
 			   .mux_in_b(a[3:0]),
 			   .mux_sel(sela), 
 			   .mux_out(aout)
 			   );
 	mux4 mux_b(.mux_in_a(b[7:4]),
-			   .mux_in_b(b[3:0]),
+			   .mux_in_b(b_in[3:0]),
 			   .mux_sel(selb), 
 			   .mux_out(bout)
 			   );
@@ -71,10 +80,11 @@ module top
 		     	 .state(state),
 	  	     	 .sela(sela),
 		     	 .selb(selb),
+			 .changed(changed),
 		     	 .sel_shifter(sel_shift),
 		     	 .done_flag(done_flag)
 		   );
-	counter6 counter(.clk(clk),
+	counter6 counter(.clk(clk),.changed(changed),
 		  			 .rst(rst),
 		  			 .start(start),
 				 	 .cnt(cnt)
