@@ -11,7 +11,9 @@ module detect_input(
 		if(!rst) begin a_out <= 8'b0;
 			       b_out <= 8'b0;
 			 end
-		else  	 begin a_out<=a;
+		else 
+		  	begin 
+			       a_out<=a;
 			       b_out<=b;
 			end
 	end

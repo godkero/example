@@ -10,6 +10,8 @@ parameter IDLE=3'b000,S0 = 3'b001,  S1 = 3'b010,
 	input 		    clk,rst,start,changed,
 	input      [2:0]    count,
 
+
+	output		    locked,
 	output reg       	data_sel,clk_en,
 	output reg [2:0]    state,
 	output reg 	    	sela,selb,done_flag,
@@ -18,28 +20,40 @@ parameter IDLE=3'b000,S0 = 3'b001,  S1 = 3'b010,
 
 	reg        [2:0]    n_state;	
 
-	
+
+
+	always@(count,start)begin
+		case(state)
+			IDLE:  	   n_state = (start == 1'b1)? S0: IDLE;
+			S0:        n_state = (3'b001 == count )? S1 : IDLE;
+			S1:        n_state = (3'b010 == count )? S2 : S1;
+			S2:        n_state = (3'b011 == count )? S3 : S2;
+			S3:    	   n_state = (3'b100 == count )? FINISH :S3 ;
+			FINISH:    n_state = (3'b101 == count )? IDLE : IDLE;
+		endcase
+	end
+	/*
 	always@*begin
 		case({state,changed})
-			{IDLE,1'b1}:      n_state = (start == 1'b1)? S0 : IDLE;
-			{IDLE,1'b0}:      n_state = (start == 1'b1)? S0 : IDLE;
-			{S0,1'b0}:        n_state = (3'b001 == count )? S1 : IDLE;
-			{S1,1'b0}:        n_state = (3'b010 == count )? S2 : S1;
-			{S2,1'b0}:        n_state = (3'b011 == count )? S3 : S2;
-			{S3,1'b0}:    	  n_state = (3'b100 == count )? FINISH :S3 ;
+			//{IDLE,1'b1}:      n_state = (start == 1'b1)? S0 : IDLE;
+			{IDLE,1'bx}:      n_state = (start == 1'b1)? S0 : IDLE;
+			{S0,1'bx}:        n_state = (3'b001 == count )? S1 : IDLE;
+			{S1,1'bx}:        n_state = (3'b010 == count )? S2 : S1;
+			{S2,1'bx}:        n_state = (3'b011 == count )? S3 : S2;
+			{S3,1'bx}:    	  n_state = (3'b100 == count )? FINISH :S3 ;
 			{FINISH,1'b0}:    n_state = (3'b101 == count )? IDLE : IDLE;
-			{S0,1'b1}:        n_state = ERROR;
-			{S1,1'b1}:        n_state = ERROR;
-			{S2,1'b1}:        n_state = ERROR;
-			{S3,1'b1}:    	  n_state = ERROR;
-			{ERROR,1'b1} :    n_state = ERROR;
+			//{S0,1'b1}:        n_state = ERROR;
+			//{S1,1'b1}:        n_state = ERROR;
+			//{S2,1'b1}:        n_state = ERROR;
+			//{S3,1'b1}:    	  n_state = ERROR;
+			//{ERROR,1'b1} :    n_state = ERROR;
 			{ERROR,1'b0} :    n_state = S0;
 			
 			default   :	  n_state = IDLE;
 		
 		endcase
 	end
-
+	*/
 	//clk
 	always@(posedge clk or negedge rst)begin
 		if(!rst)state <= IDLE;
@@ -58,6 +72,9 @@ parameter IDLE=3'b000,S0 = 3'b001,  S1 = 3'b010,
 			ERROR:	begin sela = 1'b1;selb = 1'b1;sel_shifter = 2'b10;done_flag = 1'b0;data_sel = 1'b1;clk_en = 1'b1;end
 		endcase
 	end
+
+
+	assign locked = (state != 3'b000) ? 1'b1: 1'b0;
 
 
 endmodule

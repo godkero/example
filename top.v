@@ -6,13 +6,15 @@ module top
 	input 		    clk,rst,start,
 	input 	[7:0] 	a,b,
 	output 	[15:0] 	d_out,
+	output 		locked,
 	output 			done_flag,
 	output  [7:0]   seg_position
-	
+
 );	
 	wire    [7:0]  a_in,b_in;
 	wire        	changed;
 	wire            clk_en;
+	
 	wire    [2:0]   cnt;
 	wire 			sela,selb;
 	wire        	data_sel;
@@ -21,8 +23,8 @@ module top
 	wire 	[3:0] 	aout,bout;
 	wire    [2:0]   state;
 	wire    [15:0]  sum;
-	wire  	[15:0]	value;
-	wire	[15:0] 	s_out;	
+	wire  	[15:0]	s_out;
+	wire	[15:0] 	data_sel_out;	
 	
 	detect_input dectector(.clk(clk),
 				.rst(rst),
@@ -31,7 +33,7 @@ module top
 				.a_out(a_in),
 				.b_out(b_in),
 				.changed(changed)
-				);				
+			);				
 	
 	//mux a,b
 	mux4 mux_a(.mux_in_a(a_in[7:4]),
@@ -56,19 +58,19 @@ module top
 					 );
 	data_selector d_sel0(.d_in(d_out),
 						 .data_sel(data_sel),
-						 .p_out(sum)
+						 .p_out(data_sel_out)
 						);
 
 	//add sum
-	adder adder0(.sum(value),
+	adder adder0(.sum(sum),
 				 .dataa(s_out),
-				 .datab(sum)
+				 .datab(data_sel_out)
 				 );	
 		
 	reg_16bit data0(.clk(clk),
 			.rst(rst),
 			.clk_ena(clk_en),
-			.d(value),
+			.d(sum),
 			.p(d_out)
 			); 
 	
@@ -76,8 +78,9 @@ module top
 		     	 .rst(rst),
 		     	 .start(start),
 		     	 .count(cnt),
-			 	 .data_sel(data_sel),
-			 	 .clk_en(clk_en),
+			 .locked(locked),
+			 .data_sel(data_sel),
+			 .clk_en(clk_en),
 		     	 .state(state),
 	  	     	 .sela(sela),
 		     	 .selb(selb),
@@ -92,6 +95,6 @@ module top
 					 );	
 
 	seven_seg_cntrl seven_seg0(.inp(state),.seg_position(seg_position));
-	
+		
 
 endmodule
