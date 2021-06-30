@@ -22,14 +22,15 @@ parameter IDLE=3'b000,S0 = 3'b001,  S1 = 3'b010,
 
 
 
-	always@(count,start)begin
+	always@(count,start,state)begin
 		case(state)
-			IDLE:  	   n_state = (start == 1'b1)? S0: IDLE;
+			IDLE:  	   n_state = (start == 1'b1 && count == 3'b000)? S0:IDLE;
 			S0:        n_state = (3'b001 == count )? S1 : IDLE;
 			S1:        n_state = (3'b010 == count )? S2 : S1;
 			S2:        n_state = (3'b011 == count )? S3 : S2;
 			S3:    	   n_state = (3'b100 == count )? FINISH :S3 ;
 			FINISH:    n_state = (3'b101 == count )? IDLE : IDLE;
+			default:   n_state = IDLE;
 		endcase
 	end
 	/*
@@ -75,7 +76,7 @@ parameter IDLE=3'b000,S0 = 3'b001,  S1 = 3'b010,
 
 
 	assign locked = (state != 3'b000) ? 1'b1: 1'b0;
-
+	
 
 endmodule
 	
