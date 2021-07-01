@@ -4,9 +4,10 @@ module tb_top;
 
 	reg 	   	clk,rst,start;
 	reg 	[7:0] 	a,b;
-	reg     [7:0]   pre_a,pre_b;
+
 	reg 		changed;
 
+	wire    [7:0]   verif_a,verif_b;
 	wire    [7:0]   a_in,b_in;
 	reg     [15:0]  c;	
 	wire 	[15:0] 	d_out;
@@ -23,7 +24,8 @@ module tb_top;
 	    .locked(locked),
 	    .d_out(d_out),
 	    .done_flag(done),
-		.seg_position(seg_position)
+		.seg_position(seg_position),
+		.verif_a(verif_a),.verif_b(verif_b)
 		);
 
 	initial begin
@@ -86,6 +88,7 @@ module tb_top;
     	begin
         $dumpfile("tb_top.vcd");
         $dumpvars(0,tb_top);
+	$display("TopA(inA) * TopB(inB) result   	      Expected         change     time");
     	end
 
 
@@ -95,27 +98,20 @@ module tb_top;
 	assign a_in = (locked == 1'b1)?8'bZ:a;
 	assign b_in = (locked == 1'b1)?8'bZ:b;
 	
-	always@(locked)begin
-		if(locked) begin
-			pre_a = pre_a;
-			pre_b = pre_b;
-		end
-		else begin
-			pre_a = a;
-			pre_b = b;
-		end
+	always@(a_in,b_in,a,b)begin
+		if( a == verif_a&& b == verif_b) changed = 1'b0;
+		else 			 	 changed = 1'b1;
 	end
 
 	
 	always@(posedge done)begin
-		if(pre_a == a && pre_b == b) changed = 1'b0;
-		else changed = 1'b1;
-		$display(" time : %t %d * %d  result = %d, Expected = %d,done_flag = %d locked = %d changed = %d",$time, a,b,d_out,c,done,locked,changed);
+		$timeformat(-6,5,"us",10);	
+		$display(" %d(%d) * %d(%d)  result = %d, Expected = %d changed = %d @ %4.1t",verif_a,a,verif_b,b,d_out,c,changed,$time);
 
 	end
 
 	always@(posedge clk or negedge rst)begin
 		if(!rst) c<=16'b0;
-		else c<=a*b;
+		else c<=verif_a*verif_b;
 		end
-	endmodule
+endmodule

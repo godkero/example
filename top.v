@@ -8,7 +8,8 @@ module top
 	output 	[15:0] 	d_out,
 	output 		locked,
 	output 		done_flag,
-	output  [7:0]   seg_position
+	output  [7:0]   seg_position,
+	output  [7:0]   verif_a,verif_b
 
 );	
 	wire    [7:0]   a_in,b_in;
@@ -95,6 +96,8 @@ module top
 					 );	
 
 	seven_seg_cntrl seven_seg0(.inp(state),.seg_position(seg_position));
-		
+	
+	assign verif_a = a_in;
+	assign verif_b = b_in;
 
 endmodule
