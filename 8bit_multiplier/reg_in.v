@@ -1,6 +1,6 @@
 `timescale 10ns/10ps
 
-module detect_input(
+module reg_in(
 	input 		 clk,rst,locked,
 	input 	   [7:0] a,b,
 	output reg [7:0] a_out,b_out,

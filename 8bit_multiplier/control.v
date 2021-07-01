@@ -10,8 +10,7 @@ parameter IDLE=3'b000,S0 = 3'b001,  S1 = 3'b010,
 	input 		    clk,rst,start,changed,
 	input      [2:0]    count,
 
-
-	output		    locked,
+	output		    locked,ack,
 	output reg       	data_sel,clk_en,
 	output reg [2:0]    state,
 	output reg 	    	sela,selb,done_flag,
@@ -74,7 +73,7 @@ parameter IDLE=3'b000,S0 = 3'b001,  S1 = 3'b010,
 		endcase
 	end
 
-
+	assign ack    = (state == 3'b001) ? 1'b1: 1'b0;
 	assign locked = (state != 3'b000) ? 1'b1: 1'b0;
 	
 

@@ -86,8 +86,8 @@ module tb_top;
 
   	initial
     	begin
-        $dumpfile("tb_top.vcd");
-        $dumpvars(0,tb_top);
+        //$dumpfile("tb_top.vcd");
+        //$dumpvars(0,tb_top);
 	$display("TopA(inA) * TopB(inB) result   	      Expected         change     time");
     	end
 

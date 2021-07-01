@@ -1,4 +1,4 @@
-module reg_16bit(
+module reg_out(
 	input 		  clk,rst,clk_ena,
 	input 	   [15:0] d,
 	output reg [15:0] p
