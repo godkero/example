@@ -12,6 +12,7 @@ module seven_seg_cntrl(
 			3'b010: seg_position = 8'b01011011; //2
 			3'b011: seg_position = 8'b01001111; //3
 			3'b100: seg_position = 8'b01100110; //4
+			3'b101: seg_position = 8'b01101101; //5
 			default:seg_position = 8'b01111001; //E  
 		endcase
 	end

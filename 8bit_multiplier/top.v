@@ -6,14 +6,14 @@ module top
 	input 		clk,rst,start,
 	input 	[7:0] 	a,b,
 	output 	[15:0] 	d_out,
-	output 		locked,ack
+	output 		locked,changed,
 	output 		done_flag,
 	output  [7:0]   seg_position,
 	output  [7:0]   verif_a,verif_b
 
 );	
 	wire    [7:0]   a_in,b_in;
-	wire        	changed,clk_en;	
+	wire        	clk_en;	
 	wire    [2:0]   cnt;
 	wire 			sela,selb;
 	wire        	data_sel;
@@ -83,7 +83,6 @@ module top
 		     	 .state(state),
 	  	     	 .sela(sela),
 		     	 .selb(selb),
-			 .ack(ack),
 			 .changed(changed),
 		     	 .sel_shifter(sel_shift),
 		     	 .done_flag(done_flag)
