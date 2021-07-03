@@ -1,3 +1,7 @@
+`timescale 10ns/10ps
+
+
+//module made to manage data_out 
 module reg_out(
 	input 		  clk,rst,clk_ena,
 	input 	   [15:0] d,

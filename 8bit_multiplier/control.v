@@ -1,5 +1,8 @@
 `timescale 10ns/10ps
 
+
+
+//this moudle is made to define FSM and to manage control signal.
 module control
 #(
 parameter IDLE=3'b000,S0 = 3'b001,  S1 = 3'b010,
@@ -19,7 +22,7 @@ parameter IDLE=3'b000,S0 = 3'b001,  S1 = 3'b010,
 	reg        [2:0]    n_state;	
 
 
-
+	//next state define
 	always@(count,start,state)begin
 		case(state)
 			IDLE:  	   n_state = (start == 1'b1 && count == 3'b000)? S0:IDLE;
@@ -28,32 +31,11 @@ parameter IDLE=3'b000,S0 = 3'b001,  S1 = 3'b010,
 			S2:        n_state = (3'b011 == count )? S3 : S2;
 			S3:    	   n_state = (3'b100 == count )? FINISH :S3 ;
 			FINISH:    n_state = (3'b101 == count )? IDLE : IDLE;
-//			default:   n_state = IDLE;
+			default:   n_state = IDLE;
 		endcase
 	end
-	/*
-	always@*begin
-		case({state,changed})
-			//{IDLE,1'b1}:      n_state = (start == 1'b1)? S0 : IDLE;
-			{IDLE,1'bx}:      n_state = (start == 1'b1)? S0 : IDLE;
-			{S0,1'bx}:        n_state = (3'b001 == count )? S1 : IDLE;
-			{S1,1'bx}:        n_state = (3'b010 == count )? S2 : S1;
-			{S2,1'bx}:        n_state = (3'b011 == count )? S3 : S2;
-			{S3,1'bx}:    	  n_state = (3'b100 == count )? FINISH :S3 ;
-			{FINISH,1'b0}:    n_state = (3'b101 == count )? IDLE : IDLE;
-			//{S0,1'b1}:        n_state = ERROR;
-			//{S1,1'b1}:        n_state = ERROR;
-			//{S2,1'b1}:        n_state = ERROR;
-			//{S3,1'b1}:    	  n_state = ERROR;
-			//{ERROR,1'b1} :    n_state = ERROR;
-			{ERROR,1'b0} :    n_state = S0;
-			
-			default   :	  n_state = IDLE;
-		
-		endcase
-	end
-	*/
-	//clk
+
+	//state transfer with clk
 	always@(posedge clk or negedge rst)begin
 		if(!rst)state <= IDLE;
 		else state <= n_state;
@@ -68,12 +50,10 @@ parameter IDLE=3'b000,S0 = 3'b001,  S1 = 3'b010,
 			S2:   	begin sela = 1'b0;selb = 1'b1;sel_shifter = 2'b01;done_flag = 1'b0;data_sel = 1'b0;clk_en = 1'b1;end
 			S3:    	begin sela = 1'b0;selb = 1'b0;sel_shifter = 2'b00;done_flag = 1'b0;data_sel = 1'b0;clk_en = 1'b1;end
 			FINISH:	begin sela = 1'b1;selb = 1'b1;sel_shifter = 2'b10;done_flag = 1'b1;data_sel = 1'b1;clk_en = 1'b0;end
-			//ERROR:	begin sela = 1'b1;selb = 1'b1;sel_shifter = 2'b10;done_flag = 1'b0;data_sel = 1'b1;clk_en = 1'b1;end
 		endcase
 	end
 
-	//assign ack    = (state == 3'b001) ? 1'b1: 1'b0;
-	assign locked = (state != 3'b000) ? 1'b1: 1'b0;
+	assign locked = (state != IDLE && state != FINISH) ? 1'b1: 1'b0;
 	
 
 endmodule

@@ -1,5 +1,7 @@
 `timescale 10ns/10ps
 
+
+//to multiply 2^n
 module shifter(
 	input 		[7:0]   inp,
 	input  		[1:0]	shift_cntrl,

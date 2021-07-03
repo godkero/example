@@ -1,10 +1,10 @@
 `timescale 10ns/10ps
 
+//module made to  manage input data 
 module reg_in(
 	input 		 clk,rst,locked,
 	input 	   [7:0] a,b,
-	output reg [7:0] a_out,b_out,
-	output reg 	 changed
+	output reg [7:0] a_out,b_out
 );
 
 	always@(posedge clk or negedge rst)begin
@@ -23,13 +23,5 @@ module reg_in(
 	end
 
 
-	always@(*)begin
-		if(a_out == a && b_out == b)begin 
-			changed = 1'b0;
-		end 
-		else begin
-			changed = 1'b1;
-		end
-	end
 
 endmodule 
