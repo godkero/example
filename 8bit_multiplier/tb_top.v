@@ -47,28 +47,28 @@ module tb_top;
 		tb_a = $urandom%256;
 		tb_b = $urandom%256;
 		if(start == 1'b1)begin
-						 repeat(2)@(posedge clk); start = ~start;
+			repeat(2)@(posedge clk); start = ~start;
 		end
 		#10 
 		start = $urandom%2;
 		tb_a = $urandom%256;
 		tb_b = $urandom%256;
 		if(start == 1'b1)begin
-						 repeat(2)@(posedge clk); start = ~start;
+			 repeat(2)@(posedge clk); start = ~start;
 		end
 		#20 
 		start = $urandom%2;
 		tb_a = $urandom%256;
 		tb_b = $urandom%256;
-		if(start == 1'b1)begin
-						 repeat(2)@(posedge clk); start = ~start;
+		if(start == 1'b1)begin				 
+			repeat(2)@(posedge clk); start = ~start;
 		end
 		#30 
 		start = $urandom%2;
 		tb_a = $urandom%256;
 		tb_b = $urandom%256;
 		if(start == 1'b1)begin
-						 repeat(2)@(posedge clk); start = ~start;
+			 repeat(2)@(posedge clk); start = ~start;
 		end
 		#43 
 		start = $urandom%2;
