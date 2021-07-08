@@ -8,8 +8,8 @@ void set_filter(unsigned char *fil_in, int fil_len);
 void set_arr(unsigned char *arr_in, int arr_len);
 void print_array(unsigned char *arr, int h, int w);
 int depth1_value(int ypos, int xpos, int in_len, int filter_len, unsigned char *arr_in, unsigned char *filter_in, int stride);
-unsigned char* convolution_cal(unsigned char *arr_in, unsigned char *filter_in, int in_len, int filter_len, int stride, int padding);
-void convolution_channel(unsigned char *arr_in, unsigned char *filter_in, unsigned char * arr_out,int in_len, int filter_len,int out_len, int stride, int padding, int channel);
+unsigned char* convolution_cal(unsigned char *arr_in, unsigned char *filter_in, int in_len, int filter_len,int out_len, int stride, int padding);
+void convolution_channel(unsigned char *arr_in, unsigned char *filter_in, unsigned char * arr_out,int in_len, int filter_len,int out_len, int stride, int padding, int channel, int count);
 
 
 int main(int args,char*argv[]){
@@ -23,7 +23,6 @@ int main(int args,char*argv[]){
 	fpBmp = fopen(argv[1], "rb");
 	destBmp = fopen(argv[2], "wb");
 
-
 	if (fpBmp == NULL || destBmp == NULL)
 	{
 		printf("error\n");
@@ -36,53 +35,59 @@ int main(int args,char*argv[]){
 	fread(&infoHeader, sizeof(BITMAPINFOHEADER), 1, fpBmp);
 
 	int bitmap_size = infoHeader.bitWidth * infoHeader.bitHeight * 3;
-
 	int in_len = infoHeader.bitWidth;
+	printf("in_len = %d\n",in_len);
+
 	unsigned char *data = (unsigned char *)calloc(bitmap_size, sizeof(unsigned char));
 	unsigned char *temp = (unsigned char *)calloc(bitmap_size, sizeof(unsigned char));
 
 	fread(data, bitmap_size, 2, fpBmp);
 
-	//RGB split
-	split(data, temp, bitmap_size, 3);
+	//--------------------- file input
 
+	//parameters
 	int arr_len = infoHeader.bitWidth;
 	int filter_len = 3;
-
-	//int *arr_in = (int *)calloc(arr_len * arr_len, sizeof(int));
-	unsigned char *arr_in = temp;
-	unsigned char *filter_in = (unsigned char *)calloc(filter_len * filter_len, sizeof(unsigned char));
-
+	int channel_count = 3;
 	int padding = 0;
 	int stride = 1;
 
+
 	int out_len = (((in_len - filter_len) + 2 * padding) / stride) + 1;
+	printf("out_len = %d\n",out_len);
+	int out_size = out_len * out_len * 3;
+	int out_pixel = out_len * out_len;
+	//set and init
+	unsigned char *filter_in = (unsigned char *)calloc(filter_len * filter_len, sizeof(unsigned char));
+	unsigned char *arr_out = (unsigned char *)calloc(out_size, sizeof(unsigned char));
+	printf("size = %d\n", out_size);
+	//if want to merge
+	unsigned char *file_out = (unsigned char *)calloc(out_size, sizeof(unsigned char));
+	set_filter(filter_in, filter_len);
 
-	unsigned char *arr_out = (unsigned char *)calloc(out_len * out_len *3,sizeof(unsigned char));
-	//set_arr(arr_in, arr_len);
-	set_filter(filter_in,filter_len);
-	unsigned char *file_out = (unsigned char *)calloc(out_len * out_len * 3, sizeof(unsigned char));
+	//input split using channel 
+	split(data, temp, bitmap_size, channel_count);
 
-	printf("start\n");
-	//              arr_in,filter_in,arr_out,in_size,filter_size,stride,padding
-	//unsigned char *arr_in, unsigned char *filter_in, int in_len, int filter_len, int stride, int padding, int channel
-	convolution_channel(arr_in, filter_in,arr_out, arr_len, filter_len,out_len, 1, 0,3);
+	printf("start convolution\n");
+	for(int i = 0 ; i < 3 ; i ++)
+		convolution_channel(temp, filter_in,(arr_out + out_pixel * i) , arr_len, filter_len,out_len, stride, padding,channel_count,i);
 
-	merge_channel(arr_out, file_out, size, 3);
-	printf("after merge\n");
 
-	
+	//------------------- merge and file output
+	merge_channel(arr_out, file_out,out_size, 3);
+	printf("after merge\n");	
 	fwrite(&fileHeader, sizeof(BITMAPFILEHEADER), 1, destBmp);
 	fwrite(&infoHeader, sizeof(BITMAPINFOHEADER), 1, destBmp);
 	printf("write bitmap data\n");
-	fwrite(arr_out, out_len*out_len*3, 1, destBmp);
+	fwrite(arr_out, out_size, 1, destBmp);
 
 	fclose(fpBmp);
 	fclose(destBmp);
-	free(arr_in);
 	free(filter_in);
-	//free(temp);
 	free(data);
+	free(temp);
+	free(arr_out);
+	free(file_out);
 
 	return 0;
 	}
@@ -174,8 +179,6 @@ void set_filter(unsigned char * fil_in,int fil_len){
 }
 
 
-
-
 //convolution operating
 int depth1_value(int ypos, int xpos, int in_len, int filter_len, unsigned char *arr_in, unsigned char *filter_in, int stride)
 {
@@ -198,26 +201,39 @@ int depth1_value(int ypos, int xpos, int in_len, int filter_len, unsigned char *
 	return temp;
 }
 
-void convolution_channel(unsigned char *arr_in, unsigned char *filter_in,unsigned char *arr_out, int in_len, int filter_len,int out_len, int stride, int padding, int channel)
+void convolution_channel(unsigned char *arr_in, unsigned char *filter_in,unsigned char *arr_out, int in_len, int filter_len,int out_len, int stride, int padding, int channel,int count)
 {
 
-	unsigned char *ptr;
-	unsigned char * out_ptr;
+	unsigned char * ptr;
 
+	unsigned char * anchor = arr_out;
 
-	 for(int i = 0 ; i < channel ; i++){
-		ptr = (unsigned char *)(arr_in + i * (in_len * in_len));
-		out_ptr = arr_out + i *(out_len * out_len);
-		out_ptr = convolution_cal(ptr, filter_in, in_len, filter_len, stride, padding);
-	 }
+	 //for(int i = 0 ; i < channel ; i++){
+	ptr = (unsigned char *)(arr_in + count * (in_len * in_len));
+		
+	arr_out = (arr_out + count *(out_len * out_len));
+		//printf("size = %d\n", arr_out + i *out_len * out_len);
+		//printf("ptr = %d\n", i * (out_len * out_len));
+	arr_out = convolution_cal(ptr, filter_in, in_len, filter_len, out_len, stride, padding);
+		//printf("address = %ld\n", (unsigned char*)out_ptr - (unsigned char*)anchor);
+	//}
 
+	for(int i = 0 ; i < out_len ; i++){
+		if (i == 0 && *(arr_out + (out_len * out_len * 2) + i) != *(out_ptr + i))
+		{
+			printf("%d ", *(arr_out + (out_len * out_len * 2) + i));
+			printf("%d\n", *(out_ptr + i));
+		}
+		else if (*(arr_out + (out_len * out_len * 2) + i ) != *(out_ptr+i)){
+			printf("error\n");
+		}
+	}
 
 }
 
-unsigned char* convolution_cal(unsigned char *arr_in, unsigned char *filter_in, int in_len, int filter_len, int stride, int padding)
+unsigned char* convolution_cal(unsigned char *arr_in, unsigned char *filter_in, int in_len, int filter_len,int out_len, int stride, int padding)
 {
 
-	int out_len = (((in_len - filter_len) + 2*padding) / stride) + 1;
 	
 	int padded_len = in_len + (padding*2);
 	unsigned char * padded_arr = (unsigned char *)calloc(padded_len * padded_len, sizeof(unsigned char));
@@ -225,10 +241,10 @@ unsigned char* convolution_cal(unsigned char *arr_in, unsigned char *filter_in, 
 	
 	unsigned char * arr_out = (unsigned char*)calloc(out_len * out_len,sizeof(unsigned char));
 
-
+	//printf("size = %d\n", out_len * out_len);
 
 	//padding
-	printf("padding init--------------------------------------------\n\n");
+	//printf("padding init--------------------------------------------\n\n");
 	int k = 0;
 	for(int i = 0; i < padded_len ; i++){
 		for(int j = 0 ; j < padded_len ;j++){
@@ -243,11 +259,11 @@ unsigned char* convolution_cal(unsigned char *arr_in, unsigned char *filter_in, 
 			}
 		}
 	}
-	printf("padding width = %d\n",padded_len);
+	//printf("padding width = %d\n",padded_len);
 	//print_array(padded_arr, padded_len, padded_len);
 
 
-	printf("result -----------------------------------------------------\n");
+	//printf("result -----------------------------------------------------\n");
 	//add stride 
 	for(int i = 0; i < out_len  ;i++){
 		for(int j = 0 ; j < out_len ; j++){
@@ -256,7 +272,7 @@ unsigned char* convolution_cal(unsigned char *arr_in, unsigned char *filter_in, 
 		}
 	}
 
-	printf("out width = %d\n", out_len);
+	//printf("out width = %d\n", out_len);
 	//print_array(arr_out,out_len,out_len);
 	
 	free(padded_arr);
